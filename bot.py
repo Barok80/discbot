@@ -1,8 +1,13 @@
+import os
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 
-# Replace 'your_token_here' with your bot's token
-TOKEN = 'MTI1OTk4ODAyNTIzMjg1NTA1MQ.GKEljJ.yAhv7vB9_goMQdjarhCUJQXoGxVLR12lOk8COQ'
+load_dotenv()
+
+
+# Get the token from environment variables
+TOKEN = os.getenv('DISCORD_TOKEN')
 
 # Set up the bot
 intents = discord.Intents.default()
@@ -19,5 +24,21 @@ async def on_member_join(member):
     welcome_channel = discord.utils.get(guild.text_channels, name='guardian-welcome')  # Ensure you have a channel named 'welcome'
     if welcome_channel:
         await welcome_channel.send(f'Welcome to the server, {member.mention}!')
+
+@bot.event
+async def on_disconnect():
+    print('Bot has been disconnected.')
+
+@bot.event
+async def on_connect():
+    print('Bot has reconnected.')
+
+@bot.event
+async def on_error(event, *args, **kwargs):
+    with open('err.log', 'a') as f:
+        if event == 'on_message':
+            f.write(f'Unhandled message: {args[0]}\n')
+        else:
+            raise
 
 bot.run(TOKEN)
