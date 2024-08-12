@@ -1,10 +1,10 @@
 import os
 import discord
+import random
 from discord.ext import commands
 from dotenv import load_dotenv
 
 load_dotenv()
-
 
 # Get the token from environment variables
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -21,7 +21,7 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
     guild = member.guild
-    welcome_channel = discord.utils.get(guild.text_channels, name='guardian-welcome')  # Ensure you have a channel named 'welcome'
+    welcome_channel = discord.utils.get(guild.text_channels, name='guardian-welcome')  # Ensure you have a channel named 'guardian-welcome'
     if welcome_channel:
         await welcome_channel.send(f'Welcome to the server, {member.mention}!')
 
@@ -41,4 +41,15 @@ async def on_error(event, *args, **kwargs):
         else:
             raise
 
+# Command to generate a random number between a given range
+@bot.command(name='random')
+async def random_number(ctx, min: int, max: int):
+    if min > max:
+        await ctx.send("The minimum value cannot be greater than the maximum value.")
+        return
+
+    number = random.randint(min, max)
+    await ctx.send(f'Your random number between {min} and {max} is: {number}')
+
+# Run the bot with your token
 bot.run(TOKEN)
